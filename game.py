@@ -11,6 +11,15 @@ class Game:
         self.round_count = 0
         self.active_player = None
         self.alive_count = 5 
+        self.action_to_char = {
+            '0': -1,
+            '1': -1,
+            '2': -1,
+            '3': 0,
+            '4': 1,
+            '5': 2,
+            '6': 4,
+        }
 
         self.alive_count = player_count
 
@@ -26,11 +35,7 @@ class Game:
             name = i
 
             # create a player
-<<<<<<< HEAD
-            player = player.Player(cards=cards, coins=2, name=i, is_bot=True, agent=None)
-=======
             player = Player(cards, 2, i, True, Agent())
->>>>>>> 86a85ca628acc49ab990ce4a2bac5028bdd1cf4a
             self.players.append(player)
 
     def challenge(self, active_player, action, target_player):
@@ -43,14 +48,10 @@ class Game:
         
         success = True
 
-<<<<<<< HEAD
-    def challenge(self):
-        return
-=======
         if len(challenges) != 0:
             challenger = random.choice(challenges)
 
-            if card is in active_player.cards:
+            if card in active_player.cards:
                 success = False
                 
             print(challenges)
@@ -58,30 +59,37 @@ class Game:
             quit()
 
         return success
->>>>>>> 86a85ca628acc49ab990ce4a2bac5028bdd1cf4a
 
-    def do_action(self):
-        action_type = self.active_player.get_action(state=None) # get from player object
+    def do_action(self, action_type):
+        action_type = self.active_player.get_action()
         
         # Take a coin (-)
         if action_type == 0:
-            return
-        # Take foreign aid (-)
+            self.active_player.coins += 1
+        # Take foreign aid (-, c)
         elif action_type == 1:
-            return
+            self.active_player.coins += 2
         # Coup (+)
         elif action_type == 2:
-            return
-        # Use Duke (-, c)
+            self.active_player.coins -= 7
+            if len(self.target_player.cards) > 0:
+                self.target_player.remove_card()
+        # Use Ambassador (-, c)
         elif action_type == 3:
-            return
-        # Take Ambassador (-, d)
+            self.active_player.cards.append(self.pull_card())
+            self.active_player.cards.append(self.pull_card())
+            self.active_player.remove_card()
+            self.active_player.remove_card()
+
+        # Use Assassin (+, c)
         elif action_type == 4:
-            return
-        # Take foreign aid
+            self.active_player.coins -= 3
+            if len(self.target_player.cards) > 0:
+                self.target_player.remove_card()
+        # Use Captain (+, c)
         elif action_type == 5:
             return
-        # Take foreign aid
+        # Use Duke (-, c)
         else:
             return
         

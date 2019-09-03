@@ -10,6 +10,7 @@ class Game:
         self.players = []
         self.round_count = 0
         self.active_player = None
+        self.target_player = None
         self.alive_count = 5 
 
         self.alive_count = player_count
@@ -26,11 +27,7 @@ class Game:
             name = i
 
             # create a player
-<<<<<<< HEAD
-            player = player.Player(cards=cards, coins=2, name=i, is_bot=True, agent=None)
-=======
             player = Player(cards, 2, i, True, Agent())
->>>>>>> 86a85ca628acc49ab990ce4a2bac5028bdd1cf4a
             self.players.append(player)
 
     def challenge(self, active_player, action, target_player):
@@ -43,10 +40,6 @@ class Game:
         
         success = True
 
-<<<<<<< HEAD
-    def challenge(self):
-        return
-=======
         if len(challenges) != 0:
             challenger = random.choice(challenges)
 
@@ -58,7 +51,6 @@ class Game:
             quit()
 
         return success
->>>>>>> 86a85ca628acc49ab990ce4a2bac5028bdd1cf4a
 
     def do_action(self):
         action_type = self.active_player.get_action(state=None) # get from player object
@@ -99,3 +91,49 @@ class Game:
         card = self.deck[index]
         del self.deck[index]
         return card
+    
+
+    def play(self):
+        player_index = random.randint(0, len(self.players))
+        while self.alive_count > 1:
+            self.active_player = self.players[player_index]
+            # this means that the player is dead
+            if len(self.active_player.cards) == 0:
+                if player_index + 1 < len(self.players):
+                    player_index = player_index + 1
+                else:
+                    player_index = 0    
+                continue
+            
+            # let the active player take an action
+            action_type, self.target_player = self.active_player.get_action()
+
+            # let the challenge begin
+            if not self.challenge(self.active_player, action_type, self.target_player):
+
+                # challenge was successfull, check if the active player is still alive
+                if len(self.active_player.cards) == 0:  
+                    # decrement the number of players alive
+                    self.alive_count = self.alive_count - 1
+    
+                # increment number of rounds
+                self.round_count = self.round_count + 1
+                
+                # move to the next player
+                if player_index + 1 < len(self.players):
+                    player_index = player_index + 1
+                else:
+                    player_index = 0
+
+
+            else:
+                # challenge was not successfull
+                if self.target_player != None:
+                    counter_action_type = self.target_player.get_counter_action()
+                    self.do_counter_action(counter_action_type)
+                    
+
+            
+
+
+

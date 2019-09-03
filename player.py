@@ -13,3 +13,6 @@ class Player:
             return self.agent.act(state)
         else:
             return int(input("Action [0,6] >> "))
+
+    def get_challenge(self, state, active_player, action, target_player):
+        return 1

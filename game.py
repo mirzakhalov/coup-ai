@@ -26,11 +26,7 @@ class Game:
             name = i
 
             # create a player
-<<<<<<< HEAD
-            player = player.Player(cards=cards, coins=2, name=i, is_bot=True, agent=None)
-=======
             player = Player(cards, 2, i, True, Agent())
->>>>>>> 86a85ca628acc49ab990ce4a2bac5028bdd1cf4a
             self.players.append(player)
 
     def challenge(self, active_player, action, target_player):
@@ -44,10 +40,6 @@ class Game:
         
         success = True
 
-<<<<<<< HEAD
-    def challenge(self):
-        return
-=======
         if len(challenges) != 0:
             challenger = self.players[random.choice(challenges)]
             card = (random.randint(0,4),True,False)
@@ -61,7 +53,6 @@ class Game:
                 challenger.lose_card()
 
         return success
->>>>>>> 86a85ca628acc49ab990ce4a2bac5028bdd1cf4a
 
     def do_action(self):
         action_type = self.active_player.get_action(state=None) # get from player object

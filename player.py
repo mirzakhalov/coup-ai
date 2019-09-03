@@ -16,3 +16,18 @@ class Player:
 
     def get_challenge(self, state, active_player, action, target_player):
         return 1
+
+    def lose_card(self):
+        # Decides what card to lose and loses it
+        card_pos = 1
+        del self.cards[card_pos]
+
+    def fake_lose_card(self, state, card):
+        will_fake = False
+        return will_fake
+
+    def lose_specific_card(self, card):
+        if self.cards[0] == card:
+            del self.cards[0]
+        else:
+            del self.cards[1]

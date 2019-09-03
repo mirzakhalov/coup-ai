@@ -271,7 +271,7 @@ class Game:
             # increment number of rounds
             self.round_count = self.round_count + 1
 
-            if self.round_count >= 50:
+            if self.round_count >= 100:
                 return [0 for i in range(len(self.players))]
             
             # move to the next player

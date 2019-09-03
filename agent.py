@@ -16,7 +16,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 np.random.seed(101)
 
 class Agent(nn.Module):
-    def __init__(self, name, h_size=16, gamma=1.0, print_every=1, pop_size=50, elite_frac=0.2, sigma=0.5):
+    def __init__(self, name, h_size=32, gamma=1.0, print_every=1, pop_size=50, elite_frac=0.2, sigma=0.5):
         super(Agent, self).__init__()
         self.name = name
         self.action_count = 0
@@ -30,15 +30,13 @@ class Agent(nn.Module):
         self.fc2 = nn.Linear(self.h_size, self.a_size)
 
         self.game_count = 0
-        self.episode_return = 0
 
-        self.weights_to_evaluate = []
         self.rewards = []
         self.curr_rewards = []
 
         self.n_elite=int(pop_size*elite_frac)
 
-        self.scores_deque = deque(maxlen=100)
+        self.scores_deque = deque(maxlen=10)
         self.scores = []
         self.best_weight = sigma*np.random.randn(self.get_weights_dim())
         self.i_iteration = 0
@@ -96,24 +94,26 @@ class Agent(nn.Module):
     def next_game(self,reward):
         self.game_count += 1
         self.curr_rewards.append(reward)
-        if self.game_count >= 11:
+        if self.game_count >= 10:
             if self.evaluate_best != True:
                 self.rewards.append(np.array(self.curr_rewards).mean())
             self.weight_num += 1
             if self.weight_num >= len(self.weights_pop):
+                #print("\nNum Games: " + str(self.game_count) + " Num Weights: " + str(self.weight_num) + " Iteration: " + str(self.i_iteration))
                 self.finished_iter(np.array(self.curr_rewards).mean())
+                self.curr_rewards = []
             else:
                 self.set_weights(self.weights_pop[self.weight_num])
+                self.curr_rewards = []
             
             self.game_count = 0
-            self.curr_rewards = []
 
 
     def finished_iter(self, reward):
         elite_idxs = np.array(self.rewards).argsort()[-self.n_elite:]
 
         elite_weights = [self.weights_pop[i] for i in elite_idxs]
-        
+
         # don't update an random agent to test
         if self.name != 4:
             self.best_weight = np.array(elite_weights).mean(axis=0)
@@ -133,6 +133,7 @@ class Agent(nn.Module):
 
             if self.i_iteration % self.print_every == 0:
                 print('Agent {}: Episode {}\tAverage Score: {:.2f}'.format(self.name, self.i_iteration, np.mean(self.scores_deque)))
+                print(self.scores_deque)
             
             self.evaluate_best = False
         else:

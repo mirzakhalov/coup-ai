@@ -12,6 +12,8 @@ class Player:
         state = [self.name] + state
         #print("Valid actions: " + str(valid_actions))
         action, _ = self.agent.act(state, valid_actions)
+
+        #TODO Is not bot action
         
         return action
 

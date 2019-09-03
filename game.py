@@ -65,37 +65,47 @@ class Game:
         return success
 
     def do_action(self, action_type):
-        action_type = self.active_player.get_action()
-        
         # Take a coin (-)
         if action_type == 0:
             self.active_player.coins += 1
+
         # Take foreign aid (-, c)
         elif action_type == 1:
             self.active_player.coins += 2
+
         # Coup (+)
         elif action_type == 2:
             self.active_player.coins -= 7
             if len(self.target_player.cards) > 0:
-                self.target_player.remove_card()
+                self.target_player.lose_card()
+
         # Use Ambassador (-, c)
         elif action_type == 3:
             self.active_player.cards.append(self.pull_card())
             self.active_player.cards.append(self.pull_card())
-            self.active_player.remove_card()
-            self.active_player.remove_card()
+            cardList = self.active_player.choose_cards(state=None)
+            self.deck += cardList
 
         # Use Assassin (+, c)
         elif action_type == 4:
             self.active_player.coins -= 3
             if len(self.target_player.cards) > 0:
-                self.target_player.remove_card()
+                self.target_player.lose_card()
+
         # Use Captain (+, c)
         elif action_type == 5:
-            return
+            coins = 0
+            if self.target_player.coins == 1:
+                coins = 1
+            else:
+                coins = 2
+            
+            self.target_player.coins -= coins
+            self.active_player.coins += coins
+
         # Use Duke (-, c)
         else:
-            return
+            self.active_player.coins += 3
         
 
     

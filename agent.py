@@ -9,4 +9,6 @@ class Agent:
         # TODO feedforward through model
         self.action_count += 1
         # TODO add to memory
-        return random.randint(0,6), random.randint(0,4)
+        action_type, target_player, _, is_challenge = random.choice(valid_actions)
+        
+        return ([action_type, target_player], is_challenge)

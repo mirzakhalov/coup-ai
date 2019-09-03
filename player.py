@@ -9,21 +9,30 @@ class Player:
         self.agent = agent
 
     def get_action(self, state, valid_actions):
-        action = self.agent.act(state, valid_actions)
+        print("Valid actions: " + str(valid_actions))
+        action, _ = self.agent.act(state, valid_actions)
         
         return action
 
     def get_challenge(self, state, active_player, action, target_player):
-        return 1
+        if target_player != -1 and not(target_player is None):
+            valid_actions = [[active_player.name, action, target_player.name, i] for i in range(2)]
+        else:
+            valid_actions = [[active_player.name, action, -1, i] for i in range(2)]
+        _, is_challenge = self.agent.act(state, valid_actions)
+        return is_challenge
 
     def lose_card(self):
         # Decides what card to lose and loses it
         card_pos = 0
+        card = self.cards[card_pos]
         del self.cards[card_pos]
+        return card
 
     def fake_lose_card(self, state, card):
-        will_fake = False
-        return will_fake
+        valid_actions = [[-1, card, -1, i] for i in range(2)]
+        _, is_challenge = self.agent.act(state, valid_actions)
+        return is_challenge
 
     def choose_cards(self, state):
         index1, index2 = 0, 1
@@ -41,16 +50,5 @@ class Player:
             del self.cards[0]
         else:
             del self.cards[1]
-
-    def get_counter_action(self, action_type):
-
-        # we return -1 if we cannot counteract (or do not want to)
-        if action_type == 5:
-            return 2 #1
-        elif action_type == 4:
-            return -1
-        else:
-            return -1
-        
         
 

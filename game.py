@@ -39,28 +39,28 @@ class Game:
             player = Player(cards, 2, i, True, Agent())
             self.players.append(player)
 
-    def challenge(self, active_player, action, target_player):
+    def challenge(self, active_player, card, target_player):
         challenges = []
-        for i in range(0, len(self.players)):
-            if len(self.players[i].cards) != 0:
-                if  active_player.name != self.players[i].name:
-                    # Need insert the state in here ->
-                    if self.players[i].get_challenge(None, active_player, action, target_player):
-                        challenges.append(i)
-        
         success = True
-
-        if len(challenges) != 0:
-            challenger = self.players[random.choice(challenges)]
-            card = (random.randint(0,4),True,False)
-            # Need insert the state in here ->
-            if card[0] not in active_player.cards or active_player.fake_lose_card(None, card[0]):
-                success = False
-                active_player.lose_card()
-            else:
-                active_player.show_card(card[0])
-                active_player.cards.append(self.pull_card())
-                challenger.lose_card()
+        
+        if card != -1:
+            for i in range(0, len(self.players)):
+                if len(self.players[i].cards) != 0:
+                    if  active_player.name != self.players[i].name:
+                        # Need insert the state in here ->
+                        if self.players[i].get_challenge(None, active_player, card, target_player):
+                            challenges.append(i)
+            
+            if len(challenges) != 0:
+                challenger = self.players[random.choice(challenges)]
+                # Need insert the state in here ->
+                if card not in active_player.cards or active_player.fake_lose_card(None, card):
+                    success = False
+                    active_player.lose_card()
+                else:
+                    active_player.show_card(card)
+                    active_player.cards.append(self.pull_card())
+                    challenger.lose_card()
 
         return success
 

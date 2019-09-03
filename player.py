@@ -8,11 +8,10 @@ class Player:
         self.is_bot = is_bot
         self.agent = agent
 
-    def get_action(self, state):
-        if self.is_bot:
-            return self.agent.act(state)
-        else:
-            return int(input("Action [0,6] >> "))
+    def get_action(self, state, valid_actions):
+        action = self.agent.act(state, valid_actions)
+        
+        return action
 
     def get_challenge(self, state, active_player, action, target_player):
         return 1

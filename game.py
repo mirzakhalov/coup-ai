@@ -34,21 +34,24 @@ class Game:
         challenges = []
         for i in range(0, len(self.players)):
             if len(self.players[i].cards) != 0:
-                # Need inster the state in here ->
-                if self.players[i].get_challenge(None, active_player, action, target_player):
-                    challenges.append(i)
+                if  active_player.name != self.players[i].name:
+                    # Need insert the state in here ->
+                    if self.players[i].get_challenge(None, active_player, action, target_player):
+                        challenges.append(i)
         
         success = True
 
         if len(challenges) != 0:
-            challenger = random.choice(challenges)
-
-            if card is in active_player.cards:
+            challenger = self.players[random.choice(challenges)]
+            card = (random.randint(0,4),True,False)
+            # Need insert the state in here ->
+            if card[0] not in active_player.cards or active_player.fake_lose_card(None, card[0]):
                 success = False
-                
-            print(challenges)
-            print(challenger)
-            quit()
+                active_player.lose_card()
+            else:
+                active_player.lose_specific_card(card[0])
+                active_player.cards.append(self.pull_card())
+                challenger.lose_card()
 
         return success
 

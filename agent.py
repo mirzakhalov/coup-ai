@@ -113,7 +113,10 @@ class Agent(nn.Module):
         elite_idxs = np.array(self.rewards).argsort()[-self.n_elite:]
 
         elite_weights = [self.weights_pop[i] for i in elite_idxs]
-        self.best_weight = np.array(elite_weights).mean(axis=0)
+        
+        # don't update an random agent to test
+        if self.name != 4:
+            self.best_weight = np.array(elite_weights).mean(axis=0)
 
         if self.evaluate_best == True:
             self.scores_deque.append(reward)

@@ -26,6 +26,9 @@ class Player:
         will_fake = False
         return will_fake
 
+    def choose_cards(self, state);
+        return
+
     def show_card(self, card):
         if self.cards[0] == card:
             del self.cards[0]

@@ -1,5 +1,6 @@
 
 import random
+import player
 
 class Game:
 
@@ -27,21 +28,38 @@ class Game:
             name = i
 
             # create a player
-            player = new Player(cards, 2, i, True, agent)
+            player = player.Player(cards=cards, coins=2, name=i, is_bot=True, agent=None)
             self.players.append(player)
-
-
-
-
-    def challenge():
-
 
 
     def challenge(self):
         return
 
     def do_action(self):
-        return
+        action_type = self.active_player.get_action(state=None) # get from player object
+        
+        # Take a coin (-)
+        if action_type == 0:
+            return
+        # Take foreign aid (-)
+        elif action_type == 1:
+            return
+        # Coup (+)
+        elif action_type == 2:
+            return
+        # Use Duke (-, c)
+        elif action_type == 3:
+            return
+        # Take Ambassador (-, d)
+        elif action_type == 4:
+            return
+        # Take foreign aid
+        elif action_type == 5:
+            return
+        # Take foreign aid
+        else:
+            return
+        
 
     
     def reset():

@@ -8,12 +8,10 @@ class Player:
         self.is_bot = is_bot
         self.agent = agent
 
-    def get_action(self, state):
-        if self.is_bot:
-            #return self.agent.act(state)
-            return 2, 1
-        else:
-            return int(input("Action [0,6] >> "))
+    def get_action(self, state, valid_actions):
+        action = self.agent.act(state, valid_actions)
+        
+        return action
 
     def get_challenge(self, state, active_player, action, target_player):
         return 1
@@ -27,7 +25,18 @@ class Player:
         will_fake = False
         return will_fake
 
-    def lose_specific_card(self, card):
+    def choose_cards(self, state):
+        index1, index2 = 0, 1
+
+        card1 = self.cards[index1]
+        card2 = self.cards[index2]
+
+        del self.cards[index1]
+        del self.cards[index2]
+
+        return [card1, card2]
+
+    def show_card(self, card):
         if self.cards[0] == card:
             del self.cards[0]
         else:

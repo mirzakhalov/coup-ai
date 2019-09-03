@@ -40,63 +40,73 @@ class Game:
             player = Player(cards, 2, i, True, Agent())
             self.players.append(player)
 
-    def challenge(self, active_player, action, target_player):
+    def challenge(self, active_player, card, target_player):
         challenges = []
-        for i in range(0, len(self.players)):
-            if len(self.players[i].cards) != 0:
-                if  active_player.name != self.players[i].name:
-                    # Need insert the state in here ->
-                    if self.players[i].get_challenge(None, active_player, action, target_player):
-                        challenges.append(i)
-        
         success = True
-
-        if len(challenges) != 0:
-            challenger = self.players[random.choice(challenges)]
-            card = (random.randint(0,4),True,False)
-            # Need insert the state in here ->
-            if card[0] not in active_player.cards or active_player.fake_lose_card(None, card[0]):
-                success = False
-                active_player.lose_card()
-            else:
-                active_player.lose_specific_card(card[0])
-                active_player.cards.append(self.pull_card())
-                challenger.lose_card()
+        
+        if card != -1:
+            for i in range(0, len(self.players)):
+                if len(self.players[i].cards) != 0:
+                    if  active_player.name != self.players[i].name:
+                        # Need insert the state in here ->
+                        if self.players[i].get_challenge(None, active_player, card, target_player):
+                            challenges.append(i)
+            
+            if len(challenges) != 0:
+                challenger = self.players[random.choice(challenges)]
+                # Need insert the state in here ->
+                if card not in active_player.cards or active_player.fake_lose_card(None, card):
+                    success = False
+                    active_player.lose_card()
+                else:
+                    active_player.show_card(card)
+                    active_player.cards.append(self.pull_card())
+                    challenger.lose_card()
 
         return success
 
     def do_action(self, action_type):
-        action_type = self.active_player.get_action()
-        
         # Take a coin (-)
         if action_type == 0:
             self.active_player.coins += 1
+
         # Take foreign aid (-, c)
         elif action_type == 1:
             self.active_player.coins += 2
+
         # Coup (+)
         elif action_type == 2:
             self.active_player.coins -= 7
             if len(self.target_player.cards) > 0:
-                self.target_player.remove_card()
+                self.target_player.lose_card()
+
         # Use Ambassador (-, c)
         elif action_type == 3:
             self.active_player.cards.append(self.pull_card())
             self.active_player.cards.append(self.pull_card())
-            self.active_player.remove_card()
-            self.active_player.remove_card()
+            cardList = self.active_player.choose_cards(state=None)
+            self.deck += cardList
 
         # Use Assassin (+, c)
         elif action_type == 4:
             self.active_player.coins -= 3
             if len(self.target_player.cards) > 0:
-                self.target_player.remove_card()
+                self.target_player.lose_card()
+
         # Use Captain (+, c)
         elif action_type == 5:
-            return
+            coins = 0
+            if self.target_player.coins == 1:
+                coins = 1
+            else:
+                coins = 2
+            
+            self.target_player.coins -= coins
+            self.active_player.coins += coins
+
         # Use Duke (-, c)
         else:
-            return
+            self.active_player.coins += 3
         
 
     

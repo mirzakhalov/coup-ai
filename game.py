@@ -1,16 +1,23 @@
 
 
 class Game:
-    deck = []
-    players = []
-    round_count = 0
-    active_player = None
-    alive_count = 5 
+
+    self.deck = []
+    self.players = []
+    self.round_count = 0
+    self.active_player = None
+    self.alive_count = 5 
 
 
 
-    def __init__(self):
-        return
+    def __init__(self, player_count):
+        
+
+
+
+    def challenge():
+
+
 
     def challenge(self):
         return

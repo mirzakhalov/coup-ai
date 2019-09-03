@@ -26,7 +26,7 @@ class Player:
         will_fake = False
         return will_fake
 
-    def lose_specific_card(self, card):
+    def show_card(self, card):
         if self.cards[0] == card:
             del self.cards[0]
         else:

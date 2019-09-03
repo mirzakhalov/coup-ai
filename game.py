@@ -58,7 +58,7 @@ class Game:
                 success = False
                 active_player.lose_card()
             else:
-                active_player.lose_specific_card(card[0])
+                active_player.show_card(card[0])
                 active_player.cards.append(self.pull_card())
                 challenger.lose_card()
 

@@ -49,6 +49,9 @@ class Agent(nn.Module):
 
         self.evaluate_best = False
 
+    def get_model(self,path):
+        self.load_state_dict(torch.load(path))
+
     def act(self, state, valid_actions):
         # TODO feedforward through model
         self.action_count += 1

@@ -3,6 +3,7 @@ from agent import Agent
 import random
 import player
 
+
 class Game:
 
     def __init__(self, player_count):
@@ -13,7 +14,7 @@ class Game:
         self.target_player = None
         self.alive_count = 5 
         self.action_to_char = {
-            '0': -1,
+            '0': -1, 
             '1': -1,
             '2': -1,
             '3': 0,
@@ -112,9 +113,50 @@ class Game:
         del self.deck[index]
         return card
     
+    def get_valid_actions(self):
+        output = []
+        # if coins more than 10, we HAVE TO coup
+        if self.active_player.coins >= 10:
+            for i in range(0, len(self.players)):
+                if i != self.active_player.name and len(self.players[i].cards) != 0:
+                    output.append([2,i,-1])
+            return output
+        #
+        output.append([0,-1,-1])
+        output.append([1,-1,-1])
+        output.append([3,-1,-1])
+        output.append([6,-1,-1])
+        for i in range(0, len(self.players)):
+            if i != self.active_player.name and len(self.players[i].cards) != 0:
+                output.append([5,i,-1])
+                if self.active_player.coins >= 3:
+                    output.append([4,i,-1])
+                if self.active_player.coins >= 7:
+                    output.append([2,i,-1])
+
+        return output
+
+    def get_valid_counter_actions(self, action_type):
+        if action_type != 4 or action_type != 5:
+            return []
+        
+        output = []
+        # if the action is steal, this is an extra option of stealing with captain
+        if action_type == 5:
+            output.append([action_type,self.active_player.name,2])
+
+        # if the action is steal, this is an option for an ambassador, 
+        # else if this is an assassination, this represents not counteracting
+        output.append([action_type,self.active_player.name,1])
+        output.append([action_type,self.active_player.name,0])
+
+        return output
+            
+    
 
     def play(self):
-        player_index = random.randint(0, len(self.players))
+        player_index = random.randint(0, len(self.players)-1)
+        print(len(self.players))
         while self.alive_count > 1:
             self.active_player = self.players[player_index]
             # this means that the player is dead
@@ -125,33 +167,50 @@ class Game:
                     player_index = 0    
                 continue
             
+            
+            print('Player ' + str(player_index) + ' turn')
             # let the active player take an action
-            action_type, self.target_player = self.active_player.get_action()
+            action_type, target_player = self.active_player.get_action(None, self.get_valid_actions())
+            print('Action ' + str(action_type) + ' was chosen. Targeted player ' + str(target_player))
+
+            # assign a target player if the action permits
+            if target_player != None:
+                self.target_player = self.players[target_player]
+            else:
+                self.target_player = None
 
             # let the challenge begin
-            if not self.challenge(self.active_player, action_type, self.target_player):
-
-                # challenge was successfull, check if the active player is still alive
-                if len(self.active_player.cards) == 0:  
-                    # decrement the number of players alive
-                    self.alive_count = self.alive_count - 1
-    
-                # increment number of rounds
-                self.round_count = self.round_count + 1
-                
-                # move to the next player
-                if player_index + 1 < len(self.players):
-                    player_index = player_index + 1
-                else:
-                    player_index = 0
-
-
-            else:
+            if self.challenge(self.active_player, self.action_to_char[str(action_type)], self.target_player):
+                print('Challenge was not successful. Action taking place...')
                 # challenge was not successfull
-                if self.target_player != None:
-                    counter_action_type = self.target_player.get_counter_action()
-                    self.do_counter_action(counter_action_type)
+                if self.target_player != None and len(self.target_player.cards) != 0:
+                    # return -1 if the counteraction doesn't exist, otherwise returns the index of the card
+                    counter_action_card = self.target_player.get_counter_action(action_type, self.get_valid_counter_actions(action_type))
+                    print('Targeted player wants to counteract with ' + str(counter_action_card))
+                    # everyone has a chance to challenge the counteraction card
+                    if self.challenge(self.target_player, counter_action_card, self.active_player):
+                        self.do_action(action_type)
+                else:
+                    self.do_action(action_type)
                     
+
+
+             # challenge was successfull, check how many players are still alive
+            for i in range(0, len(self.players)):
+                count = 0  
+                if len(self.players[i].cards) != 0:
+                    count += 1
+                self.alive_count = count
+            fprint('Remaining alive count: ' + str(count))
+
+            # increment number of rounds
+            self.round_count = self.round_count + 1
+            
+            # move to the next player
+            if player_index + 1 < len(self.players):
+                player_index = player_index + 1
+            else:
+                player_index = 0
 
             
 

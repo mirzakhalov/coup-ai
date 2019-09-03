@@ -37,8 +37,22 @@ class Game:
             name = i
 
             # create a player
-            player = Player(cards, 2, i, True, Agent())
+            player = Player(cards, 2, i, True, Agent(i))
             self.players.append(player)
+
+    def get_state(self):
+        state = []
+        for i in range(len(self.players)):
+            state += [self.players[i].name, self.players[i].coins, len(self.players[i].cards)]
+        if len(self.players[i].cards) == 0:
+            state += [-1, -1]
+        elif len(self.players[i].cards) == 1:
+            state += [-1, self.players[i].cards[0]]
+        else:
+            state += self.players[i].cards
+        state += [self.active_player.name]
+
+        return state
 
     def challenge(self, active_player, card, target_player):
         challenges = []
@@ -47,23 +61,21 @@ class Game:
         if card != -1:
             for i in range(0, len(self.players)):
                 if  active_player.name != self.players[i].name and len(self.players[i].cards) != 0:
-                    # Need insert the state in here ->
-                    if self.players[i].get_challenge(None, active_player, card, target_player):
+                    if self.players[i].get_challenge(self.get_state(), active_player, card, target_player):
                         challenges.append(i)
             
             if len(challenges) != 0:
                 challenger = self.players[random.choice(challenges)]
                 
-                # Need insert the state in here ->
-                if card not in active_player.cards or active_player.fake_lose_card(None, card):
+                if card not in active_player.cards or active_player.fake_lose_card(self.get_state(), card):
                     success = False
                     self.deck.append(active_player.lose_card())
                 else:
                     active_player.show_card(card)
                     active_player.cards.append(self.pull_card())
                     self.deck.append(challenger.lose_card())
-                    if card == 4:
-                        print("Challenger: " + str(challenger.name))
+                    #if card == 4:
+                        #print("Challenger: " + str(challenger.name))
 
         return success
 
@@ -88,7 +100,7 @@ class Game:
         elif action_type == 3:
             self.active_player.cards.append(self.pull_card())
             self.active_player.cards.append(self.pull_card())
-            cardList = self.active_player.choose_cards(state=None)
+            cardList = self.active_player.choose_cards(state=self.get_state())
             self.deck += cardList
 
         # Use Assassin (+, c)
@@ -114,12 +126,27 @@ class Game:
         
 
     
-    def reset():
-        self.deck = []
-        self.players = []
+    def reset(self):
+        self.deck = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4]
         self.round_count = 0
         self.active_player = None
+        self.target_player = None
         self.alive_count = 5 
+
+        # adding players to the game
+        for i in range(0, len(self.players)):
+
+            # pull 2 cards from the deck and deal to each player
+            cards = []
+            cards.append(self.pull_card())
+            cards.append(self.pull_card())
+
+            # set the name for the player
+            name = i
+
+            # create a player
+            self.players[i].cards = cards
+            self.players[i].coins = 2
 
     def pull_card(self):
         index = random.randint(0, len(self.deck)-1)
@@ -180,7 +207,7 @@ class Game:
 
     def play(self):
         player_index = random.randint(0, len(self.players)-1)
-        print(len(self.players))
+        #print(len(self.players))
         while self.alive_count > 1:
             self.active_player = self.players[player_index]
             # this means that the player is dead
@@ -191,12 +218,12 @@ class Game:
                     player_index = 0    
                 continue
             
-            self.render()
+            #self.render()
             
-            print('Player ' + str(player_index) + ' turn')
+            #print('Player ' + str(player_index) + ' turn')
             # let the active player take an action
-            action_type, target_player = self.active_player.get_action(None, self.get_valid_actions())
-            print('Action ' + str(action_type) + ' was chosen. Targeted player ' + str(target_player))
+            action_type, target_player = self.active_player.get_action(self.get_state(), self.get_valid_actions())
+            #print('Action ' + str(action_type) + ' was chosen. Targeted player ' + str(target_player))
 
             # assign a target player if the action permits
             if target_player != -1:
@@ -206,13 +233,13 @@ class Game:
 
             # let the challenge begin
             if self.challenge(self.active_player, self.action_to_char[str(action_type)], self.target_player):
-                print('Challenge was not successful. Action taking place...')
+                #print('Challenge was not successful. Action taking place...')
                 # challenge was not successfull
                 if action_type == 1:
                     challenges = []
                     for i in range(0, len(self.players)):
                         if self.players[i].name != self.active_player.name and len(self.players[i].cards) != 0:
-                            if self.players[i].get_challenge(None, self.active_player, self.action_to_char[str(action_type)], self.players[i]):
+                            if self.players[i].get_challenge(self.get_state(), self.active_player, self.action_to_char[str(action_type)], self.players[i]):
                                 challenges.append(i)
 
                     if len(challenges) != 0:
@@ -223,8 +250,8 @@ class Game:
 
                 elif self.target_player != None and len(self.target_player.cards) != 0 and action_type != 2:
                     # return -1 if the counteraction doesn't exist, otherwise returns the index of the card
-                    counter_action, person = self.target_player.get_action(None, self.get_valid_counter_actions(action_type))
-                    print('Targeted player wants to counteract with ' + str(self.action_to_char[str(counter_action)]))
+                    counter_action, person = self.target_player.get_action(self.get_state(), self.get_valid_counter_actions(action_type))
+                    #print('Targeted player wants to counteract with ' + str(self.action_to_char[str(counter_action)]))
                     # everyone has a chance to challenge the counteraction card
                     if self.challenge(self.target_player, self.action_to_char[str(counter_action)], self.active_player):
                         self.do_action(action_type)
@@ -239,10 +266,13 @@ class Game:
                 if len(self.players[i].cards) != 0:
                     count += 1
                 self.alive_count = count
-            print('Remaining alive count: ' + str(count))
+            #print('Remaining alive count: ' + str(count))
 
             # increment number of rounds
             self.round_count = self.round_count + 1
+
+            if self.round_count >= 50:
+                return [0 for i in range(len(self.players))]
             
             # move to the next player
             if player_index + 1 < len(self.players):
@@ -250,7 +280,9 @@ class Game:
             else:
                 player_index = 0
 
-            
-
-
-
+        rewards = [0 for i in range(len(self.players))]
+        for i in range(0, len(self.players)):
+            if len(self.players[i].cards) != 0:
+                rewards[i] += 1
+        
+        return rewards

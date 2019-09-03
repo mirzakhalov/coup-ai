@@ -1,7 +1,6 @@
 
 
-class Game():
-
+class Game:
     deck = []
     players = []
     round_count = 0
@@ -10,16 +9,14 @@ class Game():
 
 
 
-    def init():
+    def __init__(self):
+        return
 
+    def challenge(self):
+        return
 
+    def do_action(self):
+        return
 
-    def challenge():
-
-
-
-    def do_action():
-
-
-    
-    def reset():
+    def reset(self):
+        return

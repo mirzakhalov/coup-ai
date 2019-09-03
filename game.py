@@ -40,6 +40,10 @@ class Game:
 
         if len(challenges) != 0:
             challenger = random.choice(challenges)
+
+            if card is in active_player.cards:
+                success = False
+                
             print(challenges)
             print(challenger)
             quit()

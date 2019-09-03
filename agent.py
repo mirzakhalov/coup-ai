@@ -5,7 +5,7 @@ class Agent:
         self.model = None
         self.action_count = 0
 
-    def act(self, state):
+    def act(self, state, valid_actions):
         # TODO feedforward through model
         self.action_count += 1
         # TODO add to memory
